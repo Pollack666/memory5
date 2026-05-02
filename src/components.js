@@ -36,15 +36,16 @@ export const Card = ({ children, style, onPress, highlight }) => (
   </TouchableOpacity>
 );
 
-export const Btn = ({ label, onPress, variant = 'primary', style, disabled }) => {
+export const Btn = ({ label, onPress, variant, style, disabled }) => {
+  const v2 = variant || 'primary';
   const styles = {
-    primary: { bg: C.accent,                        fg: '#fff',    border: C.accent                       },
-    ghost:   { bg: C.surface2,                      fg: C.text,    border: C.border                       },
-    danger:  { bg: 'rgba(255,95,95,0.12)',           fg: C.danger,  border: 'rgba(255,95,95,0.3)'          },
-    purple:  { bg: 'rgba(176,111,255,0.12)',         fg: C.pinCat,  border: 'rgba(176,111,255,0.3)'        },
-    success: { bg: 'rgba(62,207,142,0.12)',          fg: C.success, border: 'rgba(62,207,142,0.3)'         },
+    primary: { bg: C.accent,                     fg: '#fff',    border: C.accent                  },
+    ghost:   { bg: C.surface2,                    fg: C.text,    border: C.border                  },
+    danger:  { bg: 'rgba(255,95,95,0.12)',         fg: C.danger,  border: 'rgba(255,95,95,0.3)'    },
+    purple:  { bg: 'rgba(176,111,255,0.12)',       fg: C.pinCat,  border: 'rgba(176,111,255,0.3)'  },
+    success: { bg: 'rgba(62,207,142,0.12)',        fg: C.success, border: 'rgba(62,207,142,0.3)'   },
   };
-  const v = styles[variant] || styles.primary;
+  const v = styles[v2] || styles.primary;
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -87,7 +88,7 @@ export const ToggleRow = ({ label, sub, value, onValueChange }) => (
 
 export const BackBtn = ({ onPress }) => (
   <TouchableOpacity onPress={onPress} activeOpacity={0.75} style={{ width:36, height:36, borderRadius:11, backgroundColor:C.surface2, borderColor:C.border, borderWidth:1, alignItems:'center', justifyContent:'center' }}>
-    <Text style={{ fontSize:18, color:C.text }}>←</Text>
+    <Text style={{ fontSize:18, color:C.text }}>{'<'}</Text>
   </TouchableOpacity>
 );
 
@@ -109,7 +110,7 @@ export const ToastBanner = ({ toast }) => {
   }, [toast.show]);
   const translateY = anim.interpolate({ inputRange:[0,1], outputRange:[-90,0] });
   return (
-    <Animated.View style={{ position:'absolute', top:Platform.OS==='ios'?58:12, left:10, right:10, zIndex:999, transform:[{translateY}], opacity:anim, pointerEvents:'none' }}>
+    <Animated.View style={{ position:'absolute', top:Platform.OS==='ios'?58:12, left:10, right:10, zIndex:999, transform:[{translateY}], opacity:anim }}>
       <View style={{ backgroundColor:'rgba(18,20,28,0.97)', borderColor:C.border, borderWidth:1, borderRadius:18, padding:12, flexDirection:'row', alignItems:'flex-start', gap:10, shadowColor:'#000', shadowOffset:{width:0,height:8}, shadowOpacity:0.6, shadowRadius:20 }}>
         <View style={{ width:34, height:34, borderRadius:10, backgroundColor:'rgba(79,115,255,0.15)', alignItems:'center', justifyContent:'center' }}>
           <Text style={{ fontSize:17 }}>{toast.icon}</Text>
@@ -124,7 +125,9 @@ export const ToastBanner = ({ toast }) => {
   );
 };
 
-export const ActiveDot = ({ color = C.success, size = 7 }) => {
+export const ActiveDot = ({ color, size }) => {
+  const c = color || C.success;
+  const s = size || 7;
   const pulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     Animated.loop(
@@ -135,4 +138,34 @@ export const ActiveDot = ({ color = C.success, size = 7 }) => {
     ).start();
   }, []);
   return (
-    <Animated.View style={{ width:size, height:size, borderRadius:size/2, backgroundColor:color, opacity:pulse, marginTop:4 }}​​​​​​​​​​​​​​​​
+    <Animated.View style={{ width:s, height:s, borderRadius:s/2, backgroundColor:c, opacity:pulse, marginTop:4 }}/>
+  );
+};
+
+export const EmptyState = ({ icon, title, sub, action, actionLabel }) => (
+  <View style={{ alignItems:'center', paddingVertical:60, paddingHorizontal:30 }}>
+    <Text style={{ fontSize:40, marginBottom:14 }}>{icon}</Text>
+    <Text style={{ fontSize:16, fontWeight:'700', color:C.text2, textAlign:'center' }}>{title}</Text>
+    {sub ? <Text style={{ fontSize:13, color:C.text3, textAlign:'center', marginTop:6, lineHeight:20 }}>{sub}</Text> : null}
+    {action && actionLabel ? (
+      <TouchableOpacity onPress={action} activeOpacity={0.75} style={{ marginTop:20, backgroundColor:C.accent, borderRadius:13, paddingVertical:11, paddingHorizontal:24 }}>
+        <Text style={{ color:'#fff', fontWeight:'700', fontSize:14 }}>{actionLabel}</Text>
+      </TouchableOpacity>
+    ) : null}
+  </View>
+);
+
+export const AmenityGrid = ({ amenities, selected, onSelect }) => (
+  <View style={{ flexDirection:'row', flexWrap:'wrap', gap:8, paddingHorizontal:16 }}>
+    {amenities.map(function(a) {
+      const isSel = selected === (a.icon + ' ' + a.label);
+      return (
+        <TouchableOpacity key={a.label} onPress={function(){ onSelect(a.icon + ' ' + a.label); }} activeOpacity={0.75}
+          style={{ width:'22%', alignItems:'center', gap:4, paddingVertical:10, borderRadius:13, borderWidth:1, borderColor:isSel?C.pinCat:C.border, backgroundColor:isSel?'rgba(176,111,255,0.1)':C.card }}>
+          <Text style={{ fontSize:20 }}>{a.icon}</Text>
+          <Text style={{ fontSize:9, fontWeight:'700', color:isSel?C.pinCat:C.text2, textAlign:'center' }}>{a.label}</Text>
+        </TouchableOpacity>
+      );
+    })}
+  </View>
+);
